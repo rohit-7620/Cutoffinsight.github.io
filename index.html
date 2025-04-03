@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IIT/NIT Admission Predictor</title>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>IIT / NIT Admission Predictor</h1>
+            <p>Estimate your potential college options based on past closing ranks from JoSAA data.</p>
+        </header>
+
+        {% if load_error %}
+            <div class="error-message global-error">{{ load_error }}</div>
+        {% else %}
+            <form id="predictor-form">
+                <div class="form-section">
+                    <h2>Your Details (Required)</h2>
+                    <div class="form-grid grid-cols-3">
+                        <div class="form-group">
+                            <label for="rank">Your Rank:</label>
+                            <input type="number" name="rank" id="rank" required step="1" min="1" placeholder="Enter your CRL Rank">
+                        </div>
+                        <div class="form-group">
+                            <label for="category">Category:</label>
+                            <select name="category" id="category" required>
+                                <option value="" disabled selected>Select Category</option>
+                                {% for cat in dropdowns.get('categories', []) %}
+                                    <option value="{{ cat }}">{{ cat }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="pool">Gender Pool:</label>
+                            <select name="pool" id="pool" required>
+                                <option value="" disabled selected>Select Pool</option>
+                                {% for p in dropdowns.get('pools', []) %}
+                                    <option value="{{ p }}">{{ p }}</option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                 </div>
+
+                <div class="form-section collapsible">
+                     <h2 class="collapsible-header">Optional Filters <span class="arrow"></span></h2>
+                    <div class="collapsible-content">
+                        <p class="filter-note">Filter results based on historical data attributes:</p>
+                        <div class="form-grid grid-cols-4">
+                            <div class="form-group">
+                                <label for="quota">Quota:</label>
+                                <select name="quota" id="quota">
+                                    <option value="">All Quotas</option>
+                                    {% for q in dropdowns.get('quotas', []) %}
+                                        <option value="{{ q }}">{{ q }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                             <div class="form-group">
+                                <label for="institute_type">Institute Type:</label>
+                                <select name="institute_type" id="institute_type">
+                                    <option value="">Both IIT & NIT</option>
+                                    {% for itype in dropdowns.get('institute_types', []) %}
+                                        <option value="{{ itype }}">{{ itype }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                             <div class="form-group">
+                                <label for="year">Year:</label>
+                                <select name="year" id="year">
+                                    <option value="">All Years</option>
+                                    {% for y in dropdowns.get('years', []) %}
+                                        <option value="{{ y }}">{{ y }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="round_no">Round No:</label>
+                                <select name="round_no" id="round_no">
+                                    <option value="">All Rounds</option>
+                                    {% for r in dropdowns.get('rounds', []) %}
+                                        <option value="{{ r }}">{{ r }}</option>
+                                    {% endfor %}
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button type="submit" id="submit-button">Predict Colleges</button>
+            </form>
+
+            <div id="results-area" class="results-hidden">
+                <h2>Potential College Options</h2>
+                <p class="results-disclaimer">Showing colleges where the historical closing rank (for the selected filters) was greater than or equal to your rank. This is an estimate based on past data.</p>
+                <div id="error-message" class="error-message"></div>
+                <div id="loading-indicator" style="display: none;"><div class="spinner"></div>Loading results...</div>
+                <div id="results-table-container">
+                    <table id="results-table">
+                        <thead>
+                            <tr>
+                                <th>Institute</th>
+                                <th>Program Name</th>
+                                <th>Degree</th>
+                                <th>Year</th>
+                                <th>Round</th>
+                                <th>Closing Rank</th>
+                            </tr>
+                        </thead>
+                        <tbody id="results-body">
+                            <!-- Results will be populated by JavaScript -->
+                        </tbody>
+                    </table>
+                    <p id="no-results-message" style="display: none;">No colleges found matching your criteria based on the available historical JoSAA data.</p>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+
+    <footer>
+        <p>Data based on historical JoSAA cutoffs. Always verify with official sources.</p>
+    </footer>
+
+    <script src="{{ url_for('static', filename='js/script.js') }}"></script>
+</body>
+</html> 
